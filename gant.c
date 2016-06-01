@@ -1106,12 +1106,17 @@ void trackpoints_decode(ushort bloblen, ushort pkttype, ushort pktlen,
 void
 usage(void)
 {
-  fprintf(stderr, "Usage: %s -a authfile\n"
-          "[ -o outfile ]\n"
-          "[ -d devno ]\n"
-          "[ -i id ]\n"
-          "[ -m mydev ]\n"
-          "[ -p ]\n",
+  fprintf(stderr, "Usage: %s\n"
+          "[ -a authfile ] pairing auth file (default ~/.gant)\n"
+          "[ -f fname    ] device name for pairing (default garmin)\n"
+          "[ -d devno    ] serial device number (/dev/ttyUSB<devno>, default 0)\n"
+          "[ -i id       ] id to use for pairing\n"
+          "[ -m mydev    ] device id\n"
+          "[ -v ] enable verbose output\n"
+          "[ -D ] enable debug output\n"
+          "[ -r ] force reset of watch\n"
+          "[ -n ] don't write auth file \n"
+          "[ -z ] disable pairing\n",
           progname
           );
   exit(1);
@@ -1551,6 +1556,7 @@ int main(int ac, char *av[])
       sprintf(authfile, "%s/.gant", getenv("HOME"));
   }
   progname = av[0];
+  opterr=0;
   while ((c = getopt(ac, av, "a:d:i:m:vDrnzf:")) != -1) {
     switch(c) {
     case 'a':
@@ -1583,8 +1589,9 @@ int main(int ac, char *av[])
     case 'z':
       nopairing = 1;
       break;
-    default:
-      fprintf(stderr, "unknown option %s\n", optarg);
+    case '?':
+      fprintf(stderr, "Unknown option %s.\n\n", av[optind-1]);
+    default: // shouldn't happen if all opstring chars are switched
       usage();
     }
   }
